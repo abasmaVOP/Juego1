@@ -28,7 +28,13 @@ function createGrid() {
     for (let i = 0; i < gridSize; i++) {
         const tile = document.createElement('div');
         tile.classList.add('tile');
+        // Evento para PC (click)
         tile.addEventListener('click', () => handleTileClick(i));
+        // Eventos táctiles para móvil
+        tile.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evitar comportamiento por defecto (como scroll o zoom)
+            handleTileClick(i);
+        });
         grid.appendChild(tile);
     }
 }
