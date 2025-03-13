@@ -1,0 +1,123 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    text-align: center;
+}
+
+#score {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#start-btn {
+    font-size: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#start-btn:hover {
+    background-color: #45a049;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(4, 80px); /* 4 columnas de 80px */
+    grid-gap: 5px;
+    width: 340px; /* 4 * 80 + 3 * 5 (gap) */
+    margin: 20px auto;
+}
+
+.tile {
+    width: 80px;
+    height: 80px;
+    background-color: white;
+    border: 2px solid #ccc;
+    cursor: pointer;
+}
+
+.tile.red-transition {
+    transition: background-color 0.5s ease; /* Transición suave de 0.5s para el color */
+}
+
+#game-over {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: red;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#home-screen {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#home-screen h1 {
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+#home-screen button {
+    font-size: 20px;
+    padding: 15px 30px;
+    margin: 10px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#home-screen button:hover {
+    background-color: #1976D2;
+}
+
+#home-btn {
+    font-size: 20px;
+    padding: 10px 20px;
+    background-color: #FF5722;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#home-btn:hover {
+    background-color: #E64A19;
+}
+
+#final-time {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: green;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+}
