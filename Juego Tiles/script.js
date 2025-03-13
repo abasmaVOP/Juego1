@@ -111,12 +111,10 @@ function handleTileClick(index) {
                 }
             }
         } else if (currentMode === 'faster') {
-            const currentTime = Date.now();
-            clickTimes.push(currentTime);
-            updateMultiplier();
-            score += multiplier;
-            scoreDisplay.textContent = `Score: ${score} | x${multiplier}`;
-            moveSingleBlackTile(index);
+            clickTimes = []; // Reiniciar tiempos de clics
+            multiplier = 1; // Reiniciar multiplicador
+            setBlackTiles(); // 3 tiles negros como en 10s
+            scoreDisplay.textContent = `Score: ${score} | CPS: 0 | x${multiplier}`;
         }
     } else {
         clearInterval(timer);
@@ -160,20 +158,13 @@ function updateMultiplier() {
     clickTimes = clickTimes.filter(time => now - time <= 1000);
     const cps = clickTimes.length;
 
-    // Determinar el multiplicador basado en CPS sostenido
-    if (cps >= 6) {
+    // Ajustar multiplicador según CPS
+    if (cps >= 4) {
         multiplier = 2;
-    } else if (cps >= 5) {
+    } else if (cps >= 3) {
         multiplier = 1.5;
-    } else if (cps >= 4) {
-        multiplier = 1;
     } else {
-        multiplier = 1; // Por defecto, hasta que se mantenga 1 segundo
-    }
-
-    // Solo aplicar el multiplicador si se mantiene por al menos 1 segundo
-    if (clickTimes.length > 1 && (now - clickTimes[0]) < 1000) {
-        multiplier = 1; // Si no ha pasado 1 segundo, mantener x1
+        multiplier = 1;
     }
 }
 
