@@ -44,7 +44,6 @@ function setBlackTiles() {
     blackTiles = [];
     const tiles = document.querySelectorAll('.tile');
     tiles.forEach(tile => tile.style.backgroundColor = 'white');
-
     while (blackTiles.length < 3) {
         const randomIndex = Math.floor(Math.random() * gridSize);
         if (!blackTiles.includes(randomIndex)) {
@@ -58,7 +57,6 @@ function setBlackTilesPatterns() {
     blackTiles = [];
     const tiles = document.querySelectorAll('.tile');
     tiles.forEach(tile => tile.style.backgroundColor = 'white');
-
     while (blackTiles.length < 4) {
         const randomIndex = Math.floor(Math.random() * gridSize);
         if (!blackTiles.includes(randomIndex)) {
@@ -111,10 +109,17 @@ function handleTileClick(index) {
                 }
             }
         } else if (currentMode === 'faster') {
-            clickTimes = []; // Reiniciar tiempos de clics
-            multiplier = 1; // Reiniciar multiplicador
-            setBlackTiles(); // 3 tiles negros como en 10s
-            scoreDisplay.textContent = `Score: ${score} | CPS: 0 | x${multiplier}`;
+            const currentTime = Date.now();
+            clickTimes.push(currentTime);
+            // Solo sumar puntos si ya se alcanzó 4 CPS (controlado por hasReached4Cps)
+            const now = Date.now();
+            const recentClicks = clickTimes.filter(time => now - time <= 1000);
+            const cps = recentClicks.length > 1 ? (recentClicks.length / ((now - recentClicks[0]) / 1000)).toFixed(2) : 0.00;
+            // Usar una variable externa para verificar hasReached4Cps (se definirá en startBtn)
+            if (window.hasReached4Cps) { // Sumar puntos solo si ya se alcanzó 4 CPS
+                score += multiplier;
+            }
+            moveSingleBlackTile(index); // Mover solo el tile clicado
         }
     } else {
         clearInterval(timer);
@@ -154,11 +159,8 @@ function showFinalTime(time) {
 
 function updateMultiplier() {
     const now = Date.now();
-    // Filtrar clics en la última ventana de 1 segundo
     clickTimes = clickTimes.filter(time => now - time <= 1000);
-    const cps = clickTimes.length;
-
-    // Ajustar multiplicador según CPS
+    const cps = clickTimes.length; // Usamos entero para el multiplicador
     if (cps >= 4) {
         multiplier = 2;
     } else if (cps >= 3) {
@@ -254,21 +256,55 @@ startBtn.addEventListener('click', () => {
         } else if (currentMode === 'faster') {
             clickTimes = []; // Reiniciar tiempos de clics
             multiplier = 1; // Reiniciar multiplicador
+            let gracePeriod = null; // Temporizador de tolerancia
+            let graceTimeLeft = 3; // 3 segundos de tolerancia
+            window.hasReached4Cps = false; // Hacerlo global para acceder desde handleTileClick
             setBlackTiles(); // 3 tiles negros como en 10s
-            scoreDisplay.textContent = `Score: ${score} | x${multiplier}`;
-        } else if (currentMode === 'patterns') {
-            patternCount = 0;
-            startTime = Date.now();
-            setBlackTilesPatterns();
-            scoreDisplay.textContent = 'Click all black tiles!';
+            scoreDisplay.textContent = `Score: ${score} | CPS: 0.00 | x${multiplier}`;
+            timer = setInterval(() => {
+                const now = Date.now();
+                clickTimes = clickTimes.filter(time => now - time <= 1000);
+                let cps = 0.00;
+                if (clickTimes.length > 1) {
+                    const timeWindow = (now - clickTimes[0]) / 1000;
+                    cps = (clickTimes.length / timeWindow).toFixed(2);
+                }
+                updateMultiplier();
+                scoreDisplay.textContent = `Score: ${score} | CPS: ${cps} | x${multiplier}`;
+
+                // Verificar si se alcanzó 4 CPS por primera vez
+                if (cps >= 4 && !window.hasReached4Cps) {
+                    window.hasReached4Cps = true;
+                }
+
+                // Manejar grace period
+                if (window.hasReached4Cps) {
+                    if (cps < 4 && !gracePeriod) {
+                        // Iniciar grace period solo si CPS baja de 4 y no hay uno activo
+                        gracePeriod = setInterval(() => {
+                            graceTimeLeft -= 0.1;
+                            if (graceTimeLeft <= 0) {
+                                clearInterval(gracePeriod);
+                                clearInterval(timer);
+                                endGame();
+                            }
+                        }, 100); // Actualizar tolerancia cada 100ms
+                    } else if (cps >= 4 && gracePeriod) {
+                        // Si CPS sube a 4+ y hay un grace period, limpiarlo y reiniciar
+                        clearInterval(gracePeriod);
+                        gracePeriod = null;
+                        graceTimeLeft = 3; // Reiniciar a 3 segundos
+                    }
+                }
+            }, 100); // Actualizar CPS cada 100ms
+        } else {
+            clearInterval(timer);
+            gameStarted = false;
+            startBtn.textContent = 'Start';
+            hideGameOver();
+            grid.innerHTML = '';
+            createGrid();
         }
-    } else {
-        clearInterval(timer);
-        gameStarted = false;
-        startBtn.textContent = 'Start';
-        hideGameOver();
-        grid.innerHTML = '';
-        createGrid();
     }
 });
 
