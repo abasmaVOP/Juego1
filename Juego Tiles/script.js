@@ -127,7 +127,6 @@ function handleTileClick(index) {
     }
 }
 
-
 // Iniciar el temporizador para el modo "10 Seconds"
 function startTimer() {
     timeLeft = 10;
@@ -169,7 +168,6 @@ function updateMultiplier() {
         multiplier = 1;
     }
 }
-
 
 // Terminar el juego con animación
 function endGame() {
@@ -297,14 +295,19 @@ startBtn.addEventListener('click', () => {
                     }
                 }
             }, 100); // Actualizar CPS cada 100ms
-        } else {
-            clearInterval(timer);
-            gameStarted = false;
-            startBtn.textContent = 'Start';
-            hideGameOver();
-            grid.innerHTML = '';
-            createGrid();
+        } else if (currentMode === 'patterns') {
+            patternCount = 0; // Reiniciar contador de patrones
+            startTime = Date.now(); // Iniciar tiempo
+            setBlackTilesPatterns(); // Colocar 4 tiles negros
+            scoreDisplay.textContent = 'Click all black tiles!'; // Mensaje inicial
         }
+    } else {
+        clearInterval(timer);
+        gameStarted = false;
+        startBtn.textContent = 'Start';
+        hideGameOver();
+        grid.innerHTML = '';
+        createGrid();
     }
 });
 
