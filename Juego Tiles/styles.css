@@ -1,9 +1,12 @@
 :root {
-    --color-botones: #110949;
-    --color-fondo: #02010a;
-    --color-texto: #003ce5;
-    --color-btn-txt: #4959ff;
-}
+    --color-fondo: #1b1818;
+    --color-texto: #FF1A1A;
+    --color-btn-txt: #F5F5F5;
+    --color-botones: #400000;
+    --color-border: #D90000;
+    --color-hover: #B00000;
+    --font-h1: "Rock Salt", cursive;
+}  
 
 body {
     margin: 0;
@@ -31,13 +34,13 @@ body {
     padding: 10px 20px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
-    border: none;
+    border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
 }
 
 #start-btn:hover {
-    background-color: #45a049;
+    background-color: var(--color-hover);
 }
 
 #grid {
@@ -49,13 +52,14 @@ body {
     margin: 20px auto;
     gap: 0; /* Eliminar el espacio entre tiles (antes era 5px) */
     padding: 0; /* Asegurar que no haya padding */
+    border: none;
 }
 
 .tile {
     width: 100%; /* Ocupar todo el ancho de la celda */
     height: 100%; /* Ocupar toda la altura de la celda */
     background-color: white;
-    border: 2px solid #0000004c; /* Eliminar el borde de 2px */
+    border: 2px solid var(--color-fondo);
     cursor: pointer;
 }
 
@@ -69,9 +73,10 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 48px;
+    font-family: var(--font-h1);
+    font-size: 2rem;
     color: red;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
     border-radius: 10px;
 }
@@ -86,8 +91,9 @@ body {
 }
 
 #home-screen h1 {
-    font-size: 36px;
-    margin-bottom: 40px;
+    font-family: var(--font-h1);
+    font-size: 2.7rem;
+    margin-bottom: 1rem;
     color: var(--color-texto);
 }
 
@@ -96,14 +102,14 @@ body {
     padding: 15px 30px;
     margin: 10px;
     background-color: var(--color-botones);
-    color: var(--color-texto);
-    border: none;
+    color: var(--color-btn-txt);
+    border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
 }
 
 #home-screen button:hover {
-    background-color: #1976D2;
+    background-color: var(--color-hover);
 }
 
 #home-btn {
@@ -111,14 +117,14 @@ body {
     padding: 10px 20px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
-    border: none;
+    border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
     margin-left: 10px;
 }
 
 #home-btn:hover {
-    background-color: #E64A19;
+    background-color: var(--color-hover);
 }
 
 #final-time {

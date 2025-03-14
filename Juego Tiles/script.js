@@ -10,6 +10,7 @@ let patternCount = 0; // Contador de patrones completados
 let startTime; // Para medir el tiempo total en Patterns
 let clickTimes = []; // Array para registrar los tiempos de los clics
 let multiplier = 1; // Multiplicador inicial
+let animationTimeouts = []; // Array para almacenar IDs de setTimeout
 
 // Elementos del DOM
 const homeScreen = document.getElementById('home-screen');
@@ -87,39 +88,38 @@ function handleTileClick(index) {
     if (!gameStarted || (currentMode === '10s' && timeLeft <= 0)) return;
 
     if (blackTiles.includes(index)) {
+        const tiles = document.querySelectorAll('.tile');
         if (currentMode === '10s') {
             score++;
             scoreDisplay.textContent = `Score: ${score} | Time: ${timeLeft}s`;
             moveSingleBlackTile(index);
         } else if (currentMode === 'patterns') {
             blackTiles = blackTiles.filter(tile => tile !== index);
-            const tiles = document.querySelectorAll('.tile');
             tiles[index].style.backgroundColor = 'white';
-
-            if (blackTiles.length === 0) {
-                patternCount++;
-                if (patternCount < 10) {
-                    setBlackTilesPatterns();
-                } else {
-                    const endTime = Date.now();
-                    const totalTime = ((endTime - startTime) / 1000).toFixed(2);
-                    gameStarted = false;
-                    startBtn.textContent = 'Start';
-                    showFinalTime(totalTime);
+            requestAnimationFrame(() => {
+                if (blackTiles.length === 0) {
+                    patternCount++;
+                    if (patternCount < 10) {
+                        setBlackTilesPatterns();
+                    } else {
+                        const endTime = Date.now();
+                        const totalTime = ((endTime - startTime) / 1000).toFixed(2);
+                        gameStarted = false;
+                        startBtn.textContent = 'Start';
+                        showFinalTime(totalTime);
+                    }
                 }
-            }
+            });
         } else if (currentMode === 'faster') {
             const currentTime = Date.now();
             clickTimes.push(currentTime);
-            // Solo sumar puntos si ya se alcanzó 4 CPS (controlado por hasReached4Cps)
             const now = Date.now();
             const recentClicks = clickTimes.filter(time => now - time <= 1000);
             const cps = recentClicks.length > 1 ? (recentClicks.length / ((now - recentClicks[0]) / 1000)).toFixed(2) : 0.00;
-            // Usar una variable externa para verificar hasReached4Cps (se definirá en startBtn)
-            if (window.hasReached4Cps) { // Sumar puntos solo si ya se alcanzó 4 CPS
+            if (window.hasReached4Cps) {
                 score += multiplier;
             }
-            moveSingleBlackTile(index); // Mover solo el tile clicado
+            moveSingleBlackTile(index);
         }
     } else {
         clearInterval(timer);
@@ -176,19 +176,22 @@ function endGame() {
     const tiles = document.querySelectorAll('.tile');
     
     for (let row = 0; row < 4; row++) {
-        setTimeout(() => {
+        const rowTimeout = setTimeout(() => {
             for (let i = row * 4; i < (row + 1) * 4; i++) {
                 tiles[i].classList.add('red-transition');
                 tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
-                setTimeout(() => {
+                const fadeTimeout = setTimeout(() => {
                     tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 1)';
                 }, 100);
+                animationTimeouts.push(fadeTimeout);
             }
             if (row === 3) {
                 showGameOver();
             }
         }, row * 250);
+        animationTimeouts.push(rowTimeout);
     }
+    clearInterval(timer);
 }
 
 // Mostrar mensaje de Game Over
@@ -247,17 +250,26 @@ startBtn.addEventListener('click', () => {
         score = 0;
         timeLeft = 10;
         startBtn.textContent = 'Restart';
+        // Cancelar todos los temporizadores de la animación
+        animationTimeouts.forEach(timeout => clearTimeout(timeout));
+        animationTimeouts = []; // Limpiar el array
         hideGameOver();
+        // Reiniciar tiles a blanco y quitar clase red-transition
+        const tiles = document.querySelectorAll('.tile');
+        tiles.forEach(tile => {
+            tile.style.backgroundColor = 'white';
+            tile.classList.remove('red-transition');
+        });
         if (currentMode === '10s') {
             setBlackTiles();
             startTimer();
         } else if (currentMode === 'faster') {
-            clickTimes = []; // Reiniciar tiempos de clics
-            multiplier = 1; // Reiniciar multiplicador
-            let gracePeriod = null; // Temporizador de tolerancia
-            let graceTimeLeft = 3; // 3 segundos de tolerancia
-            window.hasReached4Cps = false; // Hacerlo global para acceder desde handleTileClick
-            setBlackTiles(); // 3 tiles negros como en 10s
+            clickTimes = [];
+            multiplier = 1;
+            let gracePeriod = null;
+            let graceTimeLeft = 3;
+            window.hasReached4Cps = false;
+            setBlackTiles();
             scoreDisplay.textContent = `Score: ${score} | CPS: 0.00 | x${multiplier}`;
             timer = setInterval(() => {
                 const now = Date.now();
@@ -269,16 +281,11 @@ startBtn.addEventListener('click', () => {
                 }
                 updateMultiplier();
                 scoreDisplay.textContent = `Score: ${score} | CPS: ${cps} | x${multiplier}`;
-
-                // Verificar si se alcanzó 4 CPS por primera vez
                 if (cps >= 4 && !window.hasReached4Cps) {
                     window.hasReached4Cps = true;
                 }
-
-                // Manejar grace period
                 if (window.hasReached4Cps) {
                     if (cps < 4 && !gracePeriod) {
-                        // Iniciar grace period solo si CPS baja de 4 y no hay uno activo
                         gracePeriod = setInterval(() => {
                             graceTimeLeft -= 0.1;
                             if (graceTimeLeft <= 0) {
@@ -286,25 +293,27 @@ startBtn.addEventListener('click', () => {
                                 clearInterval(timer);
                                 endGame();
                             }
-                        }, 100); // Actualizar tolerancia cada 100ms
+                        }, 100);
                     } else if (cps >= 4 && gracePeriod) {
-                        // Si CPS sube a 4+ y hay un grace period, limpiarlo y reiniciar
                         clearInterval(gracePeriod);
                         gracePeriod = null;
-                        graceTimeLeft = 3; // Reiniciar a 3 segundos
+                        graceTimeLeft = 3;
                     }
                 }
-            }, 100); // Actualizar CPS cada 100ms
+            }, 100);
         } else if (currentMode === 'patterns') {
-            patternCount = 0; // Reiniciar contador de patrones
-            startTime = Date.now(); // Iniciar tiempo
-            setBlackTilesPatterns(); // Colocar 4 tiles negros
-            scoreDisplay.textContent = 'Click all black tiles!'; // Mensaje inicial
+            patternCount = 0;
+            startTime = Date.now();
+            setBlackTilesPatterns();
+            scoreDisplay.textContent = 'Click all black tiles!';
         }
     } else {
         clearInterval(timer);
         gameStarted = false;
         startBtn.textContent = 'Start';
+        // Cancelar animaciones al reiniciar manualmente
+        animationTimeouts.forEach(timeout => clearTimeout(timeout));
+        animationTimeouts = [];
         hideGameOver();
         grid.innerHTML = '';
         createGrid();
