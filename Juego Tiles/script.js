@@ -1,16 +1,34 @@
 // Variables globales
 let score = 0;
 let gameStarted = false;
-const gridSize = 16; // 4x4
+const gridSize = 16;
 let blackTiles = [];
 let timer;
 let timeLeft = 10;
 let currentMode = null;
-let patternCount = 0; // Contador de patrones completados
-let startTime; // Para medir el tiempo total en Patterns
-let clickTimes = []; // Array para registrar los tiempos de los clics
-let multiplier = 1; // Multiplicador inicial
-let animationTimeouts = []; // Array para almacenar IDs de setTimeout
+let patternCount = 0;
+let startTime;
+let clickTimes = [];
+let multiplier = 1;
+let animationTimeouts = [];
+let personalBests = {
+    '10s': 0,
+    'faster': 0,
+    'patterns': 0,
+    'rhythm': {
+        120: 0,
+        180: 0,
+        240: 0,
+        300: 0,
+        360: 0
+    }
+};
+const rhythmAudio = document.getElementById('rhythm-audio');
+let rhythmInterval;
+let rhythmCounter = 0;
+let tileNumbers = [];
+let rhythmStarted = false;
+let selectedBPM = 120;
 
 // Elementos del DOM
 const homeScreen = document.getElementById('home-screen');
@@ -21,7 +39,11 @@ const startBtn = document.getElementById('start-btn');
 const mode10sBtn = document.getElementById('mode-10s');
 const modeFasterBtn = document.getElementById('mode-faster');
 const modePatternsBtn = document.getElementById('mode-patterns');
+const modeRhythmBtn = document.getElementById('mode-rhythm');
 const homeBtn = document.getElementById('home-btn');
+const bpmSelector = document.getElementById('bpm-selector');
+const bpmButtons = document.querySelectorAll('.bpm-btn');
+const homeTitle = document.getElementById('home-title');
 
 // Crear la cuadrícula
 function createGrid() {
@@ -29,27 +51,34 @@ function createGrid() {
     for (let i = 0; i < gridSize; i++) {
         const tile = document.createElement('div');
         tile.classList.add('tile');
-        // Evento para PC (click)
         tile.addEventListener('click', () => handleTileClick(i));
-        // Eventos táctiles para móvil
         tile.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Evitar comportamiento por defecto (como scroll o zoom)
+            e.preventDefault();
             handleTileClick(i);
         });
         grid.appendChild(tile);
     }
 }
 
-// Seleccionar 3 tiles negros aleatorios
+// Seleccionar tiles negros
 function setBlackTiles() {
     blackTiles = [];
+    tileNumbers = [];
     const tiles = document.querySelectorAll('.tile');
-    tiles.forEach(tile => tile.style.backgroundColor = 'white');
-    while (blackTiles.length < 3) {
+    tiles.forEach(tile => {
+        tile.style.backgroundColor = 'white';
+        tile.textContent = '';
+    });
+    const tileCount = currentMode === 'rhythm' ? 4 : 3;
+    while (blackTiles.length < tileCount) {
         const randomIndex = Math.floor(Math.random() * gridSize);
         if (!blackTiles.includes(randomIndex)) {
             blackTiles.push(randomIndex);
             tiles[randomIndex].style.backgroundColor = 'black';
+            if (currentMode === 'rhythm') {
+                tileNumbers.push(blackTiles.length);
+                tiles[randomIndex].textContent = blackTiles.length;
+            }
         }
     }
 }
@@ -67,26 +96,27 @@ function setBlackTilesPatterns() {
     }
 }
 
-// Mover solo el tile negro clicado
-function moveSingleBlackTile(clickedIndex) {
+// Mover un tile negro
+function moveSingleBlackTile(clickedIndex, newNumber = null) {
     const tiles = document.querySelectorAll('.tile');
     let newIndex;
-
     do {
         newIndex = Math.floor(Math.random() * gridSize);
     } while (blackTiles.includes(newIndex) || newIndex === clickedIndex);
-
     tiles[clickedIndex].style.backgroundColor = 'white';
+    tiles[clickedIndex].textContent = '';
     tiles[newIndex].style.backgroundColor = 'black';
-
     const indexInArray = blackTiles.indexOf(clickedIndex);
     blackTiles[indexInArray] = newIndex;
+    if (currentMode === 'rhythm' && newNumber !== null) {
+        tileNumbers[indexInArray] = newNumber;
+        tiles[newIndex].textContent = newNumber;
+    }
 }
 
-// Manejar clic en un tile
+// Manejar clic en tile
 function handleTileClick(index) {
     if (!gameStarted || (currentMode === '10s' && timeLeft <= 0)) return;
-
     if (blackTiles.includes(index)) {
         const tiles = document.querySelectorAll('.tile');
         if (currentMode === '10s') {
@@ -120,14 +150,39 @@ function handleTileClick(index) {
                 score += multiplier;
             }
             moveSingleBlackTile(index);
+        } else if (currentMode === 'rhythm') {
+            const tileIndex = blackTiles.indexOf(index);
+            const currentNumber = parseInt(tiles[index].textContent);
+            const minNumber = Math.min(...tileNumbers);
+            if (!rhythmStarted && currentNumber === 1) {
+                rhythmStarted = true;
+                startRhythmInterval();
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+                moveSingleBlackTile(index, Math.max(...tileNumbers) + 1);
+            } else if (rhythmStarted && currentNumber === minNumber) {
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+                moveSingleBlackTile(index, Math.max(...tileNumbers) + 1);
+            } else {
+                if (rhythmStarted) {
+                    clearInterval(rhythmInterval);
+                    rhythmAudio.pause();
+                }
+                endGame();
+            }
         }
     } else {
         clearInterval(timer);
+        if (currentMode === 'rhythm' && rhythmStarted) {
+            clearInterval(rhythmInterval);
+            rhythmAudio.pause();
+        }
         endGame();
     }
 }
 
-// Iniciar el temporizador para el modo "10 Seconds"
+// Iniciar temporizador para "10s"
 function startTimer() {
     timeLeft = 10;
     scoreDisplay.textContent = `Score: ${score} | Time: ${timeLeft}s`;
@@ -141,7 +196,7 @@ function startTimer() {
     }, 1000);
 }
 
-// Nueva función para mostrar el tiempo final
+// Mostrar tiempo final en "Patterns"
 function showFinalTime(time) {
     let finalTime = document.getElementById('final-time');
     if (!finalTime) {
@@ -152,14 +207,15 @@ function showFinalTime(time) {
     finalTime.textContent = `${time}s`;
     finalTime.style.display = 'block';
     setTimeout(() => {
-        finalTime.style.display = 'none'; // Ocultar después de 3 segundos
+        finalTime.style.display = 'none';
+        updatePersonalBest(time);
     }, 3000);
 }
 
 function updateMultiplier() {
     const now = Date.now();
     clickTimes = clickTimes.filter(time => now - time <= 1000);
-    const cps = clickTimes.length; // Usamos entero para el multiplicador
+    const cps = clickTimes.length;
     if (cps >= 4) {
         multiplier = 2;
     } else if (cps >= 3) {
@@ -169,24 +225,30 @@ function updateMultiplier() {
     }
 }
 
-// Terminar el juego con animación
+// Terminar juego
 function endGame() {
     gameStarted = false;
+    rhythmStarted = false;
     startBtn.textContent = 'Start';
     const tiles = document.querySelectorAll('.tile');
-    
+    if (tiles.length === 0) return; // Evita errores si la cuadrícula ya se limpió
     for (let row = 0; row < 4; row++) {
         const rowTimeout = setTimeout(() => {
             for (let i = row * 4; i < (row + 1) * 4; i++) {
-                tiles[i].classList.add('red-transition');
-                tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
-                const fadeTimeout = setTimeout(() => {
-                    tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 1)';
-                }, 100);
-                animationTimeouts.push(fadeTimeout);
+                if (tiles[i]) { // Verifica que el tile exista
+                    tiles[i].classList.add('red-transition');
+                    tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+                    const fadeTimeout = setTimeout(() => {
+                        if (tiles[i]) tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 1)';
+                    }, 100);
+                    animationTimeouts.push(fadeTimeout);
+                }
             }
-            if (row === 3) {
-                showGameOver();
+            if (row === 3 && document.getElementById('game-container').style.display === 'block') {
+                showGameOver(); // Solo muestra si sigue en la pantalla de juego
+                if (currentMode !== 'patterns') {
+                    updatePersonalBest(score);
+                }
             }
         }, row * 250);
         animationTimeouts.push(rowTimeout);
@@ -194,7 +256,7 @@ function endGame() {
     clearInterval(timer);
 }
 
-// Mostrar mensaje de Game Over
+// Mostrar "Game Over"
 function showGameOver() {
     let gameOver = document.getElementById('game-over');
     if (!gameOver) {
@@ -206,59 +268,143 @@ function showGameOver() {
     gameOver.style.display = 'block';
 }
 
-// Ocultar mensaje de Game Over
+// Ocultar mensajes de fin
 function hideGameOver() {
     const gameOver = document.getElementById('game-over');
-    if (gameOver) {
-        gameOver.style.display = 'none';
-    }
+    if (gameOver) gameOver.style.display = 'none';
     const finalTime = document.getElementById('final-time');
-    if (finalTime) {
-        finalTime.style.display = 'none';
-    }
+    if (finalTime) finalTime.style.display = 'none';
 }
 
 // Mostrar pantalla de juego
 function showGameScreen() {
     homeScreen.style.display = 'none';
     gameContainer.style.display = 'block';
+    bpmSelector.style.display = 'none';
     createGrid();
+    grid.style.overflow = 'hidden';
+    loadPersonalBests();
 }
 
-// Configurar modo "10 Seconds"
+// Cargar PBs
+function loadPersonalBests() {
+    const savedPBs = localStorage.getItem('personalBests');
+    if (savedPBs) {
+        personalBests = JSON.parse(savedPBs);
+    }
+    let pbValue;
+    if (currentMode === 'rhythm') {
+        pbValue = personalBests[currentMode][selectedBPM] || 0;
+    } else {
+        pbValue = personalBests[currentMode] || 0;
+    }
+    document.getElementById('highscore-value').textContent = 
+        pbValue > 0 ? `${pbValue}${currentMode === 'patterns' ? 's' : ''}` : '-';
+}
+
+// Actualizar PB
+function updatePersonalBest(newScore) {
+    const isPatterns = currentMode === 'patterns';
+    let currentPB;
+    if (currentMode === 'rhythm') {
+        currentPB = personalBests[currentMode][selectedBPM] || 0;
+    } else {
+        currentPB = personalBests[currentMode] || (isPatterns ? Infinity : 0);
+    }
+    const isBetter = isPatterns ? newScore < currentPB : newScore > currentPB;
+    if (isBetter) {
+        if (currentMode === 'rhythm') {
+            personalBests[currentMode][selectedBPM] = newScore;
+        } else {
+            personalBests[currentMode] = newScore;
+        }
+        localStorage.setItem('personalBests', JSON.stringify(personalBests));
+        document.getElementById('highscore-value').textContent = 
+            `${newScore}${isPatterns ? 's' : ''}`;
+    }
+}
+
+// Iniciar intervalo de "Rhythm"
+function startRhythmInterval() {
+    rhythmAudio.src = `../rhythm-${selectedBPM}.mp3`;
+    rhythmAudio.currentTime = 0;
+    rhythmAudio.play();
+    const beatInterval = 60000 / selectedBPM;
+    rhythmInterval = setInterval(() => {
+        rhythmCounter++;
+        const tiles = document.querySelectorAll('.tile');
+        let gameOver = false;
+        blackTiles.forEach((tileIndex, i) => {
+            if (tileNumbers[i] <= rhythmCounter) {
+                gameOver = true;
+            }
+        });
+        if (gameOver) {
+            clearInterval(rhythmInterval);
+            rhythmAudio.pause();
+            endGame();
+        }
+    }, beatInterval);
+}
+
+// Iniciar "Rhythm"
+function startRhythmMode() {
+    score = 0;
+    rhythmCounter = 0;
+    rhythmStarted = false;
+    scoreDisplay.textContent = `Score: ${score}`;
+    setBlackTiles();
+}
+
+// Configurar modos
 mode10sBtn.addEventListener('click', () => {
     currentMode = '10s';
     showGameScreen();
 });
 
-// Configurar modo "Faster" (placeholder)
 modeFasterBtn.addEventListener('click', () => {
     currentMode = 'faster';
     showGameScreen();
 });
 
-// Configurar modo "Patterns"
 modePatternsBtn.addEventListener('click', () => {
     currentMode = 'patterns';
     showGameScreen();
 });
 
-// Iniciar o reiniciar el juego
+modeRhythmBtn.addEventListener('click', () => {
+    currentMode = 'rhythm';
+    bpmSelector.style.display = 'flex';
+    homeScreen.querySelectorAll('button:not(.bpm-btn)').forEach(btn => btn.style.display = 'none');
+});
+
+bpmButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        selectedBPM = parseInt(button.getAttribute('data-bpm'));
+        showGameScreen();
+    });
+});
+
+// Refrescar página con el título
+homeTitle.addEventListener('click', () => {
+    location.reload();
+});
+
+// Iniciar/reiniciar
 startBtn.addEventListener('click', () => {
     if (!gameStarted) {
         gameStarted = true;
         score = 0;
         timeLeft = 10;
         startBtn.textContent = 'Restart';
-        // Cancelar todos los temporizadores de la animación
         animationTimeouts.forEach(timeout => clearTimeout(timeout));
-        animationTimeouts = []; // Limpiar el array
+        animationTimeouts = [];
         hideGameOver();
-        // Reiniciar tiles a blanco y quitar clase red-transition
         const tiles = document.querySelectorAll('.tile');
         tiles.forEach(tile => {
             tile.style.backgroundColor = 'white';
             tile.classList.remove('red-transition');
+            tile.textContent = '';
         });
         if (currentMode === '10s') {
             setBlackTiles();
@@ -306,12 +452,18 @@ startBtn.addEventListener('click', () => {
             startTime = Date.now();
             setBlackTilesPatterns();
             scoreDisplay.textContent = 'Click all black tiles!';
+        } else if (currentMode === 'rhythm') {
+            startRhythmMode();
         }
     } else {
         clearInterval(timer);
+        if (currentMode === 'rhythm' && rhythmStarted) {
+            clearInterval(rhythmInterval);
+            rhythmAudio.pause();
+        }
         gameStarted = false;
+        rhythmStarted = false;
         startBtn.textContent = 'Start';
-        // Cancelar animaciones al reiniciar manualmente
         animationTimeouts.forEach(timeout => clearTimeout(timeout));
         animationTimeouts = [];
         hideGameOver();
@@ -320,16 +472,27 @@ startBtn.addEventListener('click', () => {
     }
 });
 
-// Volver a la pantalla de Home
+// Volver a Home
 homeBtn.addEventListener('click', () => {
     clearInterval(timer);
+    if (currentMode === 'rhythm' && rhythmStarted) {
+        clearInterval(rhythmInterval);
+        rhythmAudio.pause();
+    }
     gameStarted = false;
+    rhythmStarted = false;
     startBtn.textContent = 'Start';
-    hideGameOver();
+    // Limpiar todos los timeouts de la animación
+    animationTimeouts.forEach(timeout => clearTimeout(timeout));
+    animationTimeouts = [];
+    hideGameOver(); // Oculta inmediatamente cualquier mensaje
     grid.innerHTML = '';
     gameContainer.style.display = 'none';
     homeScreen.style.display = 'flex';
+    homeScreen.querySelectorAll('button:not(.bpm-btn)').forEach(btn => btn.style.display = 'block');
+    bpmSelector.style.display = 'none';
 });
 
-// Inicializar en la pantalla de Home
+// Inicializar
+loadPersonalBests();
 hideGameOver();

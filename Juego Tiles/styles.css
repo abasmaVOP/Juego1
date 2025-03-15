@@ -8,6 +8,11 @@
     --font-h1: "Rock Salt", cursive;
 }  
 
+/* Asegurar box-sizing consistente */
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -17,10 +22,12 @@ body {
     height: 100vh;
     background-color: var(--color-fondo);
     font-family: Arial, sans-serif;
+    overflow: hidden;
 }
 
 #game-container {
     text-align: center;
+    overflow: hidden;
 }
 
 #score {
@@ -29,9 +36,11 @@ body {
     color: var(--color-texto);
 }
 
-#start-btn {
-    font-size: 20px;
-    padding: 10px 20px;
+/* Botones de opciones (Start y Home) */
+#start-btn, #home-btn {
+    font-size: 18px; /* Ligeramente más pequeño que los modos */
+    padding: 12px 24px; /* Más compacto */
+    width: 150px; /* Ancho fijo para uniformidad en este grupo */
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
     border: 1px solid var(--color-border);
@@ -39,32 +48,42 @@ body {
     cursor: pointer;
 }
 
-#start-btn:hover {
+#start-btn:hover, #home-btn:hover {
     background-color: var(--color-hover);
+}
+
+#home-btn {
+    margin-left: 10px; /* Mantener separación */
 }
 
 #grid {
     display: grid;
-    grid-template-columns: repeat(4, 85px); /* 4 columnas de 85px = 340px total */
-    grid-template-rows: repeat(4, 85px); /* 4 filas de 85px = 340px total */
-    width: 340px; /* Mantener el ancho total */
-    height: 340px; /* Ajustar altura para coincidir con el ancho */
+    grid-template-columns: repeat(4, 85px);
+    grid-template-rows: repeat(4, 85px);
+    width: 340px;
+    height: 340px;
     margin: 20px auto;
-    gap: 0; /* Eliminar el espacio entre tiles (antes era 5px) */
-    padding: 0; /* Asegurar que no haya padding */
+    gap: 0;
+    padding: 0;
     border: none;
 }
 
 .tile {
-    width: 100%; /* Ocupar todo el ancho de la celda */
-    height: 100%; /* Ocupar toda la altura de la celda */
+    width: 100%;
+    height: 100%;
     background-color: white;
     border: 2px solid var(--color-fondo);
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    font-family: Arial, sans-serif;
 }
 
 .tile.red-transition {
-    transition: background-color 0.5s ease; /* Transición suave de 0.5s para el color */
+    transition: background-color 0.5s ease;
 }
 
 #game-over {
@@ -95,11 +114,14 @@ body {
     font-size: 2.7rem;
     margin-bottom: 1rem;
     color: var(--color-texto);
+    cursor: pointer;
 }
 
-#home-screen button {
+/* Botones de modos */
+#home-screen button:not(.bpm-btn) {
     font-size: 20px;
     padding: 15px 30px;
+    width: 200px; /* Ancho fijo para uniformidad en este grupo */
     margin: 10px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
@@ -108,22 +130,7 @@ body {
     cursor: pointer;
 }
 
-#home-screen button:hover {
-    background-color: var(--color-hover);
-}
-
-#home-btn {
-    font-size: 20px;
-    padding: 10px 20px;
-    background-color: var(--color-botones);
-    color: var(--color-btn-txt);
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-#home-btn:hover {
+#home-screen button:not(.bpm-btn):hover {
     background-color: var(--color-hover);
 }
 
@@ -138,4 +145,41 @@ body {
     background-color: rgba(0, 0, 0, 0.7);
     padding: 20px;
     border-radius: 10px;
+}
+
+#highscore-display {
+    font-size: 20px;
+    color: var(--color-texto);
+    margin-bottom: 10px;
+}
+
+#bpm-selector {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#bpm-selector h2 {
+    color: var(--color-btn-txt);
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+/* Botones de BPM */
+.bpm-btn {
+    font-size: 16px; /* Más pequeño para ajustarse al texto largo */
+    padding: 10px 20px;
+    width: 180px; /* Ancho fijo para uniformidad en este grupo */
+    background-color: var(--color-botones);
+    color: var(--color-btn-txt);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.bpm-btn:hover {
+    background-color: var(--color-hover);
 }
