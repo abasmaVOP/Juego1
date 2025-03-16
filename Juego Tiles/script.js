@@ -231,11 +231,11 @@ function endGame() {
     rhythmStarted = false;
     startBtn.textContent = 'Start';
     const tiles = document.querySelectorAll('.tile');
-    if (tiles.length === 0) return; // Evita errores si la cuadrícula ya se limpió
+    if (tiles.length === 0) return;
     for (let row = 0; row < 4; row++) {
         const rowTimeout = setTimeout(() => {
             for (let i = row * 4; i < (row + 1) * 4; i++) {
-                if (tiles[i]) { // Verifica que el tile exista
+                if (tiles[i]) {
                     tiles[i].classList.add('red-transition');
                     tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
                     const fadeTimeout = setTimeout(() => {
@@ -245,7 +245,7 @@ function endGame() {
                 }
             }
             if (row === 3 && document.getElementById('game-container').style.display === 'block') {
-                showGameOver(); // Solo muestra si sigue en la pantalla de juego
+                showGameOver();
                 if (currentMode !== 'patterns') {
                     updatePersonalBest(score);
                 }
@@ -262,9 +262,12 @@ function showGameOver() {
     if (!gameOver) {
         gameOver = document.createElement('div');
         gameOver.id = 'game-over';
-        gameOver.textContent = 'Game Over';
-        document.body.appendChild(gameOver);
+        document.getElementById('grid').appendChild(gameOver); // Lo añadimos como hijo del grid
     }
+    // Detectar si es móvil (ancho < 600px)
+    const isMobile = window.innerWidth < 600;
+    gameOver.textContent = isMobile ? 'Game\nOver' : 'Game Over';
+    gameOver.style.whiteSpace = 'pre-line'; // Respeta el salto de línea en móviles
     gameOver.style.display = 'block';
 }
 
@@ -482,10 +485,9 @@ homeBtn.addEventListener('click', () => {
     gameStarted = false;
     rhythmStarted = false;
     startBtn.textContent = 'Start';
-    // Limpiar todos los timeouts de la animación
     animationTimeouts.forEach(timeout => clearTimeout(timeout));
     animationTimeouts = [];
-    hideGameOver(); // Oculta inmediatamente cualquier mensaje
+    hideGameOver();
     grid.innerHTML = '';
     gameContainer.style.display = 'none';
     homeScreen.style.display = 'flex';

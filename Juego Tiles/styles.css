@@ -28,6 +28,7 @@ body {
 #game-container {
     text-align: center;
     overflow: hidden;
+    position: relative; /* Para posicionar #game-over relativo a este contenedor */
 }
 
 #score {
@@ -38,9 +39,9 @@ body {
 
 /* Botones de opciones (Start y Home) */
 #start-btn, #home-btn {
-    font-size: 18px; /* Ligeramente más pequeño que los modos */
-    padding: 12px 24px; /* Más compacto */
-    width: 150px; /* Ancho fijo para uniformidad en este grupo */
+    font-size: 18px;
+    padding: 12px 24px;
+    width: 150px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
     border: 1px solid var(--color-border);
@@ -53,7 +54,7 @@ body {
 }
 
 #home-btn {
-    margin-left: 10px; /* Mantener separación */
+    margin-left: 10px;
 }
 
 #grid {
@@ -66,6 +67,7 @@ body {
     gap: 0;
     padding: 0;
     border: none;
+    position: relative; /* Para centrar #game-over respecto al grid */
 }
 
 .tile {
@@ -91,13 +93,24 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); /* Centrado en el grid */
     font-family: var(--font-h1);
-    font-size: 2rem;
+    font-size: 2rem; /* 32px por defecto */
     color: red;
     background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
     border-radius: 10px;
+    text-align: center; /* Centra el texto dentro del recuadro */
+    width: 80%; /* Limita el ancho para móviles */
+    max-width: 300px; /* Máximo ancho para que no sea demasiado grande */
+}
+
+/* Media query para móviles */
+@media (max-width: 600px) {
+    #game-over {
+        font-size: 1.5rem; /* Reduce un poco el tamaño en móviles */
+        line-height: 1.2; /* Espacio entre líneas para "Game" y "Over" */
+    }
 }
 
 #home-screen {
@@ -121,7 +134,7 @@ body {
 #home-screen button:not(.bpm-btn) {
     font-size: 20px;
     padding: 15px 30px;
-    width: 200px; /* Ancho fijo para uniformidad en este grupo */
+    width: 200px;
     margin: 10px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
@@ -169,9 +182,9 @@ body {
 
 /* Botones de BPM */
 .bpm-btn {
-    font-size: 16px; /* Más pequeño para ajustarse al texto largo */
+    font-size: 16px;
     padding: 10px 20px;
-    width: 180px; /* Ancho fijo para uniformidad en este grupo */
+    width: 180px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
     border: 1px solid var(--color-border);
