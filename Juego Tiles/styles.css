@@ -28,7 +28,7 @@ body {
 #game-container {
     text-align: center;
     overflow: hidden;
-    position: relative; /* Para posicionar #game-over relativo a este contenedor */
+    position: relative;
 }
 
 #score {
@@ -67,7 +67,7 @@ body {
     gap: 0;
     padding: 0;
     border: none;
-    position: relative; /* Para centrar #game-over respecto al grid */
+    position: relative; /* Padre para #game-over */
 }
 
 .tile {
@@ -93,23 +93,26 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Centrado en el grid */
+    transform: translate(-50%, -50%); /* Centrado exacto en el grid */
     font-family: var(--font-h1);
     font-size: 2rem; /* 32px por defecto */
     color: red;
     background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
     border-radius: 10px;
-    text-align: center; /* Centra el texto dentro del recuadro */
-    width: 80%; /* Limita el ancho para móviles */
-    max-width: 300px; /* Máximo ancho para que no sea demasiado grande */
+    text-align: center; /* Texto centrado dentro del recuadro */
+    width: 80%; /* Limita el ancho */
+    max-width: 300px; /* Máximo para no exceder el grid */
+    z-index: 10; /* Asegura que esté sobre las tiles */
 }
 
 /* Media query para móviles */
 @media (max-width: 600px) {
     #game-over {
-        font-size: 1.5rem; /* Reduce un poco el tamaño en móviles */
-        line-height: 1.2; /* Espacio entre líneas para "Game" y "Over" */
+        font-size: 1.5rem; /* 24px en móviles */
+        line-height: 1.2; /* Espacio para "Game" y "Over" */
+        width: 70%; /* Ajuste para móviles */
+        max-width: 250px; /* Ligeramente más pequeño en móviles */
     }
 }
 

@@ -23,7 +23,13 @@ let personalBests = {
         360: 0
     }
 };
-const rhythmAudio = document.getElementById('rhythm-audio');
+const audioFiles = {
+    120: new Audio('../rhythm-120.mp3'),
+    180: new Audio('../rhythm-180.mp3'),
+    240: new Audio('../rhythm-240.mp3'),
+    300: new Audio('../rhythm-300.mp3'),
+    360: new Audio('../rhythm-360.mp3')
+};
 let rhythmInterval;
 let rhythmCounter = 0;
 let tileNumbers = [];
@@ -167,7 +173,8 @@ function handleTileClick(index) {
             } else {
                 if (rhythmStarted) {
                     clearInterval(rhythmInterval);
-                    rhythmAudio.pause();
+                    audioFiles[selectedBPM].pause();
+                    audioFiles[selectedBPM].currentTime = 0;
                 }
                 endGame();
             }
@@ -176,7 +183,8 @@ function handleTileClick(index) {
         clearInterval(timer);
         if (currentMode === 'rhythm' && rhythmStarted) {
             clearInterval(rhythmInterval);
-            rhythmAudio.pause();
+            audioFiles[selectedBPM].pause();
+            audioFiles[selectedBPM].currentTime = 0;
         }
         endGame();
     }
@@ -262,12 +270,11 @@ function showGameOver() {
     if (!gameOver) {
         gameOver = document.createElement('div');
         gameOver.id = 'game-over';
-        document.getElementById('grid').appendChild(gameOver); // Lo añadimos como hijo del grid
+        document.getElementById('grid').appendChild(gameOver); // Aseguramos que sea hijo de #grid
     }
-    // Detectar si es móvil (ancho < 600px)
     const isMobile = window.innerWidth < 600;
     gameOver.textContent = isMobile ? 'Game\nOver' : 'Game Over';
-    gameOver.style.whiteSpace = 'pre-line'; // Respeta el salto de línea en móviles
+    gameOver.style.whiteSpace = 'pre-line';
     gameOver.style.display = 'block';
 }
 
@@ -329,9 +336,9 @@ function updatePersonalBest(newScore) {
 
 // Iniciar intervalo de "Rhythm"
 function startRhythmInterval() {
-    rhythmAudio.src = `../rhythm-${selectedBPM}.mp3`;
-    rhythmAudio.currentTime = 0;
-    rhythmAudio.play();
+    const audio = audioFiles[selectedBPM];
+    audio.currentTime = 0;
+    audio.play();
     const beatInterval = 60000 / selectedBPM;
     rhythmInterval = setInterval(() => {
         rhythmCounter++;
@@ -344,7 +351,8 @@ function startRhythmInterval() {
         });
         if (gameOver) {
             clearInterval(rhythmInterval);
-            rhythmAudio.pause();
+            audio.pause();
+            audio.currentTime = 0;
             endGame();
         }
     }, beatInterval);
@@ -462,7 +470,8 @@ startBtn.addEventListener('click', () => {
         clearInterval(timer);
         if (currentMode === 'rhythm' && rhythmStarted) {
             clearInterval(rhythmInterval);
-            rhythmAudio.pause();
+            audioFiles[selectedBPM].pause();
+            audioFiles[selectedBPM].currentTime = 0;
         }
         gameStarted = false;
         rhythmStarted = false;
@@ -480,7 +489,8 @@ homeBtn.addEventListener('click', () => {
     clearInterval(timer);
     if (currentMode === 'rhythm' && rhythmStarted) {
         clearInterval(rhythmInterval);
-        rhythmAudio.pause();
+        audioFiles[selectedBPM].pause();
+        audioFiles[selectedBPM].currentTime = 0;
     }
     gameStarted = false;
     rhythmStarted = false;
