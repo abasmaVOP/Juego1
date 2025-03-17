@@ -129,8 +129,9 @@ body {
     font-family: var(--font-h1);
     font-size: 2.7rem;
     margin-bottom: 1rem;
-    color: var(--color-texto);
+    color: white;
     cursor: pointer;
+    text-shadow: 0 0 10px red, 0 0 20px red, 0 0 40px red, 0 0 60px red;
 }
 
 /* Botones de modos */
