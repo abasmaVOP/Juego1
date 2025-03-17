@@ -210,7 +210,7 @@ function showFinalTime(time) {
     if (!finalTime) {
         finalTime = document.createElement('div');
         finalTime.id = 'final-time';
-        document.body.appendChild(finalTime);
+        document.getElementById('grid').appendChild(finalTime);
     }
     finalTime.textContent = `${time}s`;
     finalTime.style.display = 'block';
