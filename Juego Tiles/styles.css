@@ -149,7 +149,7 @@ body {
     margin: 10px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
-    border: 2px solid var(--color-border);
+    border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
     font: normal 1.5rem var(--font-text1), cursive;
