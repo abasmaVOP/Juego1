@@ -5,7 +5,9 @@
     --color-botones: #400000;
     --color-border: #D90000;
     --color-hover: #B00000;
-    --font-h1: "Rock Salt", cursive;
+    --font-h1: "Permanent Marker";
+    --font-text1: "Indie Flower";
+    --font-text2: "Dancing Script";
 }  
 
 /* Asegurar box-sizing consistente */
@@ -21,6 +23,9 @@ body {
     align-items: center;
     height: 100vh;
     background-color: var(--color-fondo);
+    background-image: url(bg-img.jpg);
+    background-size: cover;
+    background-position: center;
     font-family: Arial, sans-serif;
     overflow: hidden;
 }
@@ -34,23 +39,27 @@ body {
 #score {
     font-size: 24px;
     margin-bottom: 20px;
-    color: var(--color-texto);
+    color: white;
+    text-shadow: 0 0 10px var(--color-texto), 0 0 20px var(--color-texto), 0 0 40px var(--color-texto), 0 0 60px var(--color-texto);
 }
 
 /* Botones de opciones (Start y Home) */
 #start-btn, #home-btn {
-    font-size: 18px;
-    padding: 12px 24px;
-    width: 150px;
+    padding: 5px 30px;
+    width: 160px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
+    text-shadow: 0 0 10px var(--color-texto), 0 0 20px var(--color-texto), 0 0 40px var(--color-texto), 0 0 60px var(--color-texto);
     border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
+    font: normal 1.5rem var(--font-text1), cursive;
+    
 }
 
 #start-btn:hover, #home-btn:hover {
     background-color: var(--color-hover);
+    text-shadow: 0 0 20px white, 0 0 40px white, 0 0 60px white, 0 0 100px white;
 }
 
 #home-btn {
@@ -126,8 +135,7 @@ body {
 }
 
 #home-screen h1 {
-    font-family: var(--font-h1);
-    font-size: 2.7rem;
+    font: normal 4rem var(--font-h1), cursive; 
     margin-bottom: 1rem;
     color: white;
     cursor: pointer;
@@ -137,7 +145,7 @@ body {
 /* Botones de modos */
 #home-screen button:not(.bpm-btn) {
     font-size: 20px;
-    padding: 15px 30px;
+    padding: 5px 30px;
     width: 200px;
     margin: 10px;
     background-color: var(--color-botones);
@@ -145,10 +153,14 @@ body {
     border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
+    font: normal 1.5rem var(--font-text1), cursive;
+    text-shadow: 0 0 10px var(--color-texto), 0 0 20px var(--color-texto), 0 0 40px var(--color-texto), 0 0 60px var(--color-texto);
+    box-shadow: 0 0 1px white, 0 0 2px white, 0 0 4px red;
 }
 
 #home-screen button:not(.bpm-btn):hover {
     background-color: var(--color-hover);
+    text-shadow: 0 0 10px white, 0 0 20px white, 0 0 40px white, 0 0 60px white;
 }
 
 #final-time {
@@ -166,12 +178,13 @@ body {
 
 #highscore-display {
     font-size: 20px;
-    color: var(--color-texto);
+    color: white;
+    text-shadow: 0 0 10px var(--color-texto), 0 0 20px var(--color-texto), 0 0 40px var(--color-texto), 0 0 60px var(--color-texto);
     margin-bottom: 10px;
 }
 
 #bpm-selector {
-    margin-top: 20px;
+    margin-top: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -180,17 +193,19 @@ body {
 
 #bpm-selector h2 {
     color: var(--color-btn-txt);
-    font-size: 20px;
+    text-shadow: 0 0 10px var(--color-texto), 0 0 20px var(--color-texto), 0 0 40px var(--color-texto), 0 0 60px var(--color-texto);
     margin-bottom: 10px;
+    font: normal 700 24px var(--font-h1), cursive;
 }
 
 /* Botones de BPM */
 .bpm-btn {
-    font-size: 16px;
+    font: normal 700 20px var(--font-text1), cursive;
     padding: 10px 20px;
     width: 180px;
     background-color: var(--color-botones);
     color: var(--color-btn-txt);
+    text-shadow: 0 0 10px var(--color-texto), 0 0 20px var(--color-texto), 0 0 40px var(--color-texto), 0 0 60px var(--color-texto);
     border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
@@ -199,4 +214,5 @@ body {
 
 .bpm-btn:hover {
     background-color: var(--color-hover);
+    text-shadow: 0 0 10px white, 0 0 20px white, 0 0 40px white, 0 0 60px white;
 }
