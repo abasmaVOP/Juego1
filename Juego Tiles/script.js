@@ -245,9 +245,10 @@ function endGame() {
             for (let i = row * 4; i < (row + 1) * 4; i++) {
                 if (tiles[i]) {
                     tiles[i].classList.add('red-transition');
-                    tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+                    tiles[i].style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+                    tiles[i].textContent = '';
                     const fadeTimeout = setTimeout(() => {
-                        if (tiles[i]) tiles[i].style.backgroundColor = 'rgba(255, 0, 0, 1)';
+                        if (tiles[i]) tiles[i].style.backgroundColor = 'rgb(255, 255, 255)';
                     }, 100);
                     animationTimeouts.push(fadeTimeout);
                 }

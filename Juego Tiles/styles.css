@@ -88,12 +88,13 @@ body {
     justify-content: center;
     align-items: center;
     color: white;
+    text-shadow: 0 0 5px var(--color-texto), 0 0 10px var(--color-texto), 0 0 20px var(--color-texto);
     font-size: 24px;
     font-family: Arial, sans-serif;
 }
 
 .tile.red-transition {
-    transition: background-color 0.5s ease;
+    transition: background-color 1s ease;
 }
 
 #game-over {
@@ -103,8 +104,27 @@ body {
     left: 50%;
     transform: translate(-50%, -50%); /* Centrado exacto en el grid */
     font-family: var(--font-h1);
-    font-size: 2rem; /* 32px por defecto */
-    color: red;
+    font-size: 48px; /* 32px por defecto */
+    color: white;
+    text-shadow: 0 0 5px var(--color-texto), 0 0 10px var(--color-texto), 0 0 20px var(--color-texto);
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center; /* Texto centrado dentro del recuadro */
+    width: 80%; /* Limita el ancho */
+    max-width: 300px; /* Máximo para no exceder el grid */
+    z-index: 10; /* Asegura que esté sobre las tiles */
+}
+
+#final-time {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: white;
+    text-shadow: 0 0 5px var(--color-texto), 0 0 10px var(--color-texto), 0 0 20px var(--color-texto);
     background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
     border-radius: 10px;
@@ -117,7 +137,7 @@ body {
 /* Media query para móviles */
 @media (max-width: 600px) {
     #game-over {
-        font-size: 1.5rem; /* 24px en móviles */
+        font-size: 2rem; /* 24px en móviles */
         line-height: 1.2; /* Espacio para "Game" y "Over" */
         width: 70%; /* Ajuste para móviles */
         max-width: 250px; /* Ligeramente más pequeño en móviles */
@@ -159,19 +179,6 @@ body {
 #home-screen button:not(.bpm-btn):hover {
     background-color: var(--color-hover);
     text-shadow: 0 0 10px white, 0 0 20px white, 0 0 40px white, 0 0 60px white;
-}
-
-#final-time {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 48px;
-    color: green;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 20px;
-    border-radius: 10px;
 }
 
 #highscore-display {
