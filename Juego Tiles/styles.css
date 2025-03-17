@@ -52,7 +52,7 @@ body {
     border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
-    font: normal 1.5rem var(--font-text1), cursive;
+    font: normal 600 1.5rem var(--font-text1), cursive;
     
 }
 
@@ -152,7 +152,7 @@ body {
     border: 1px solid var(--color-border);
     border-radius: 5px;
     cursor: pointer;
-    font: normal 1.5rem var(--font-text1), cursive;
+    font: normal 600 1.5rem var(--font-text1), cursive;
     text-shadow: 0 0 10px var(--color-texto), 0 0 20px var(--color-texto), 0 0 40px var(--color-texto), 0 0 60px var(--color-texto);
 }
 
@@ -198,7 +198,7 @@ body {
 
 /* Botones de BPM */
 .bpm-btn {
-    font: normal 700 20px var(--font-text1), cursive;
+    font: normal 600 20px var(--font-text1), cursive;
     padding: 10px 20px;
     width: 180px;
     background-color: var(--color-botones);
