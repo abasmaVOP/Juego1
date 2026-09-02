@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Especifica la carpeta donde está tu index.html
-          path: './Juego Tiles'
+          path: '../Juego Tiles'
 
       - name: Deploy to GitHub Pages
         id: deployment
